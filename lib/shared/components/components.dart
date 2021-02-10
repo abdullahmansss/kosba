@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:naruto/shared/network/remote/dio_helper.dart';
+// 123123123123123213
 
 //SharedPreferences preferences;
 
-void initApp()
-{
+void initApp() {
   DioHelper();
   //initPref();
 }
@@ -63,23 +63,24 @@ Widget defaultFormField({
 Widget defaultButton({
   @required Function press,
   @required String text,
-}) => Container(
-  width: double.infinity,
-  clipBehavior: Clip.antiAliasWithSaveLayer,
-  decoration: BoxDecoration(
-    borderRadius: BorderRadius.circular(
-      5.0,
-    ),
-    color: Colors.blue,
-  ),
-  child: MaterialButton(
-    height: 40.0,
-    onPressed: press,
-    child: Text(
-      text.toUpperCase(),
-      style: TextStyle(
-        color: Colors.white,
+}) =>
+    Container(
+      width: double.infinity,
+      clipBehavior: Clip.antiAliasWithSaveLayer,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(
+          5.0,
+        ),
+        color: Colors.blue,
       ),
-    ),
-  ),
-);
+      child: MaterialButton(
+        height: 40.0,
+        onPressed: press,
+        child: Text(
+          text.toUpperCase(),
+          style: TextStyle(
+            color: Colors.white,
+          ),
+        ),
+      ),
+    );
