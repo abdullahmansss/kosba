@@ -3,7 +3,7 @@ import 'package:naruto/modules/login/login_screen.dart';
 import 'package:naruto/shared/components/components.dart';
 import 'package:naruto/shared/network/remote/dio_helper.dart';
 
-// beaaaaaaaaaaaab
+// after test ttwo
 void main() async
 {
   WidgetsFlutterBinding.ensureInitialized();
