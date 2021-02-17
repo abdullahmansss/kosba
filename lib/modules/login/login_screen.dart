@@ -8,6 +8,8 @@ import 'package:naruto/modules/login/cubit/states.dart';
 import 'package:naruto/shared/components/components.dart';
 import 'package:flutter_facebook_login/flutter_facebook_login.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:audio_recorder/audio_recorder.dart';
+
 
 class LoginScreen extends StatelessWidget {
   var emailCon = TextEditingController();
@@ -115,6 +117,49 @@ class LoginScreen extends StatelessWidget {
                         ),
                       ],
                     ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        MaterialButton(
+                          onPressed: () async
+                          {
+                            // Check permissions before starting
+                            bool hasPermissions = await AudioRecorder.hasPermissions;
+
+                            PermissionStatus status = await Permission.microphone.request();
+
+
+                            print(hasPermissions);
+
+                            if(hasPermissions)
+                            {
+                              print('start');
+
+                              await AudioRecorder.start(path: 'new_record.mp4', audioOutputFormat: AudioOutputFormat.AAC);
+                            }
+                          },
+                          child: Text(
+                            'start',
+                            style: TextStyle(
+                              color: Colors.blue,
+                            ),
+                          ),
+                        ),
+                        MaterialButton(
+                          onPressed: () async
+                          {
+                            Recording recording = await AudioRecorder.stop();
+                            print("Path : ${recording.path},  Format : ${recording.audioOutputFormat},  Duration : ${recording.duration},  Extension : ${recording.extension},");
+                          },
+                          child: Text(
+                            'stop',
+                            style: TextStyle(
+                              color: Colors.blue,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ],
                 ),
               ),
@@ -123,6 +168,22 @@ class LoginScreen extends StatelessWidget {
         },
       ),
     );
+  }
+
+  void record() async
+  {
+    // Check permissions before starting
+    bool hasPermissions = await AudioRecorder.hasPermissions;
+
+    // Get the state of the recorder
+    bool isRecording = await AudioRecorder.isRecording;
+
+    await AudioRecorder.start(path: 'new_record.mp4', audioOutputFormat: AudioOutputFormat.AAC);
+
+    // Stop recording
+    Recording recording = await AudioRecorder.stop();
+    print("Path : ${recording.path},  Format : ${recording.audioOutputFormat},  Duration : ${recording.duration},  Extension : ${recording.extension},");
+
   }
 
   void facebookLogin() async

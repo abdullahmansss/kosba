@@ -44,6 +44,10 @@ dependencies:
   webview_flutter: ^1.0.7
   contacts_service: ^0.4.6
   permission_handler: ^5.1.0+2
+  audio_recorder: ^1.0.2
+  path_provider: ^1.6.27
+  audioplayers: ^0.17.3
+
 
   # firebase
   firebase_core: ^0.5.3
