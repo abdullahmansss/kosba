@@ -42,6 +42,8 @@ dependencies:
   get_it: ^5.0.1
 
   webview_flutter: ^1.0.7
+  contacts_service: ^0.4.6
+  permission_handler: ^5.1.0+2
 
   # firebase
   firebase_core: ^0.5.3
@@ -52,6 +54,7 @@ dependencies:
   firebase_in_app_messaging: ^0.2.3
   image_picker: ^0.6.7+17
   google_sign_in: ^4.5.9
+  flutter_facebook_login: ^3.0.0
 
 dev_dependencies:
   flutter_test:

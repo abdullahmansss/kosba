@@ -1,23 +1,35 @@
+import 'package:contacts_service/contacts_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:naruto/modules/login/cubit/cubit.dart';
 import 'package:naruto/modules/login/cubit/states.dart';
 import 'package:naruto/shared/components/components.dart';
+import 'package:flutter_facebook_login/flutter_facebook_login.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class LoginScreen extends StatelessWidget {
   var emailCon = TextEditingController();
   var passwordCon = TextEditingController();
   var formKey = GlobalKey<FormState>();
+  var scaffoldKey = GlobalKey<ScaffoldState>();
+  var kk = GlobalKey();
+
+  int x = 5;
 
   @override
   Widget build(BuildContext context) {
+    print('5');
+    print(x);
+
     return BlocProvider(
       create: (BuildContext context) => LoginCubit(),
       child: BlocConsumer<LoginCubit, LoginStates>(
         listener: (context, state) {},
         builder: (context, state) {
           return Scaffold(
+            key: scaffoldKey,
             appBar: AppBar(),
             body: Form(
               key: formKey,
@@ -55,15 +67,16 @@ class LoginScreen extends StatelessWidget {
                       height: 40.0,
                     ),
                     defaultButton(
-                      press: ()
-                      {
-                        if (formKey.currentState.validate())
-                        {
-                          LoginCubit.get(context).login(
-                            username: emailCon.text,
-                            password: passwordCon.text,
-                          );
-                        }
+                      press: () {
+                        facebookLogin();
+                        //showSnackBar();
+                        // if (formKey.currentState.validate())
+                        // {
+                        //   LoginCubit.get(context).login(
+                        //     username: emailCon.text,
+                        //     password: passwordCon.text,
+                        //   );
+                        // }
 
                         //print(getToken());
                       },
@@ -77,8 +90,20 @@ class LoginScreen extends StatelessWidget {
                       children: [
                         Text('Not have an account?'),
                         MaterialButton(
-                          onPressed: ()
+                          onPressed: () async
                           {
+                            PermissionStatus status = await Permission.contacts.request();
+
+                            if (status.isGranted)
+                            {
+                              await ContactsService.getContacts(withThumbnails: false).then((value)
+                              {
+                                value.forEach((element)
+                                {
+                                  print(element.displayName);
+                                });
+                              }).catchError((error){});
+                            }
 
                           },
                           child: Text(
@@ -99,4 +124,38 @@ class LoginScreen extends StatelessWidget {
       ),
     );
   }
+
+  void facebookLogin() async
+  {
+    final facebookLogin = FacebookLogin();
+    final result = await facebookLogin.logIn(['email']);
+
+    print(result.accessToken.token);
+
+    final faceCredential = FacebookAuthProvider.credential(result.accessToken.token);
+
+    FirebaseAuth.instance.signInWithCredential(faceCredential).then((value)
+    {
+      print(value.user.uid);
+    });
+
+    print(result.accessToken);
+  }
+
+  void showSnackBar() => scaffoldKey.currentState.showSnackBar(
+        SnackBar(
+          content: Text(
+            'Hello!!!',
+          ),
+          behavior: SnackBarBehavior.floating,
+          elevation: 0.0,
+          duration: Duration(
+            seconds: 5,
+          ),
+          action: SnackBarAction(
+            label: 'undo',
+            onPressed: () {},
+          ),
+        ),
+      );
 }
