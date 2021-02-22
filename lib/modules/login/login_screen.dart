@@ -3,13 +3,13 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:naruto/layout/home_layout.dart';
 import 'package:naruto/modules/login/cubit/cubit.dart';
 import 'package:naruto/modules/login/cubit/states.dart';
 import 'package:naruto/shared/components/components.dart';
 import 'package:flutter_facebook_login/flutter_facebook_login.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:audio_recorder/audio_recorder.dart';
-
 
 class LoginScreen extends StatelessWidget {
   var emailCon = TextEditingController();
@@ -28,7 +28,14 @@ class LoginScreen extends StatelessWidget {
     return BlocProvider(
       create: (BuildContext context) => LoginCubit(),
       child: BlocConsumer<LoginCubit, LoginStates>(
-        listener: (context, state) {},
+        listener: (context, state) {
+          if (state is LoginStateSuccess) {
+            navigateAndFinish(
+              context,
+              HomeLayout(),
+            );
+          }
+        },
         builder: (context, state) {
           return Scaffold(
             key: scaffoldKey,
@@ -70,15 +77,15 @@ class LoginScreen extends StatelessWidget {
                     ),
                     defaultButton(
                       press: () {
-                        facebookLogin();
+                        //facebookLogin();
+
                         //showSnackBar();
-                        // if (formKey.currentState.validate())
-                        // {
-                        //   LoginCubit.get(context).login(
-                        //     username: emailCon.text,
-                        //     password: passwordCon.text,
-                        //   );
-                        // }
+                        if (formKey.currentState.validate()) {
+                          LoginCubit.get(context).login(
+                            username: emailCon.text,
+                            password: passwordCon.text,
+                          );
+                        }
 
                         //print(getToken());
                       },
@@ -92,67 +99,22 @@ class LoginScreen extends StatelessWidget {
                       children: [
                         Text('Not have an account?'),
                         MaterialButton(
-                          onPressed: () async
-                          {
-                            PermissionStatus status = await Permission.contacts.request();
+                          onPressed: () async {
+                            PermissionStatus status =
+                                await Permission.contacts.request();
 
-                            if (status.isGranted)
-                            {
-                              await ContactsService.getContacts(withThumbnails: false).then((value)
-                              {
-                                value.forEach((element)
-                                {
+                            if (status.isGranted) {
+                              await ContactsService.getContacts(
+                                      withThumbnails: false)
+                                  .then((value) {
+                                value.forEach((element) {
                                   print(element.displayName);
                                 });
-                              }).catchError((error){});
+                              }).catchError((error) {});
                             }
-
                           },
                           child: Text(
                             'Register',
-                            style: TextStyle(
-                              color: Colors.blue,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        MaterialButton(
-                          onPressed: () async
-                          {
-                            // Check permissions before starting
-                            bool hasPermissions = await AudioRecorder.hasPermissions;
-
-                            PermissionStatus status = await Permission.microphone.request();
-
-
-                            print(hasPermissions);
-
-                            if(hasPermissions)
-                            {
-                              print('start');
-
-                              await AudioRecorder.start(path: 'new_record.mp4', audioOutputFormat: AudioOutputFormat.AAC);
-                            }
-                          },
-                          child: Text(
-                            'start',
-                            style: TextStyle(
-                              color: Colors.blue,
-                            ),
-                          ),
-                        ),
-                        MaterialButton(
-                          onPressed: () async
-                          {
-                            Recording recording = await AudioRecorder.stop();
-                            print("Path : ${recording.path},  Format : ${recording.audioOutputFormat},  Duration : ${recording.duration},  Extension : ${recording.extension},");
-                          },
-                          child: Text(
-                            'stop',
                             style: TextStyle(
                               color: Colors.blue,
                             ),
@@ -170,33 +132,32 @@ class LoginScreen extends StatelessWidget {
     );
   }
 
-  void record() async
-  {
+  void record() async {
     // Check permissions before starting
     bool hasPermissions = await AudioRecorder.hasPermissions;
 
     // Get the state of the recorder
     bool isRecording = await AudioRecorder.isRecording;
 
-    await AudioRecorder.start(path: 'new_record.mp4', audioOutputFormat: AudioOutputFormat.AAC);
+    await AudioRecorder.start(
+        path: 'new_record.mp4', audioOutputFormat: AudioOutputFormat.AAC);
 
     // Stop recording
     Recording recording = await AudioRecorder.stop();
-    print("Path : ${recording.path},  Format : ${recording.audioOutputFormat},  Duration : ${recording.duration},  Extension : ${recording.extension},");
-
+    print(
+        "Path : ${recording.path},  Format : ${recording.audioOutputFormat},  Duration : ${recording.duration},  Extension : ${recording.extension},");
   }
 
-  void facebookLogin() async
-  {
+  void facebookLogin() async {
     final facebookLogin = FacebookLogin();
     final result = await facebookLogin.logIn(['email']);
 
     print(result.accessToken.token);
 
-    final faceCredential = FacebookAuthProvider.credential(result.accessToken.token);
+    final faceCredential =
+        FacebookAuthProvider.credential(result.accessToken.token);
 
-    FirebaseAuth.instance.signInWithCredential(faceCredential).then((value)
-    {
+    FirebaseAuth.instance.signInWithCredential(faceCredential).then((value) {
       print(value.user.uid);
     });
 

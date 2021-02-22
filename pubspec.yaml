@@ -38,7 +38,7 @@ dependencies:
   conditional_builder: ^1.0.2
   hexcolor: ^1.0.6
   fluttertoast: ^7.1.6
-  #shared_preferences: 0.5.12
+  shared_preferences: ^0.5.12+4
   get_it: ^5.0.1
 
   webview_flutter: ^1.0.7

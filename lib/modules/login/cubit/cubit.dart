@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:naruto/modules/login/cubit/states.dart';
+import 'package:naruto/shared/components/components.dart';
 import 'package:naruto/shared/end_points.dart';
 import 'package:naruto/shared/network/remote/dio_helper.dart';
 
@@ -41,11 +42,13 @@ class LoginCubit extends Cubit<LoginStates>
 
       String token = jsonDecode(value.toString())['access_token'] as String;
 
-      // saveToken(token).then((value) {
-      //   print('success => ');
-      // }).catchError((error){
-      //   print('error => ${error.toString()}');
-      // });
+      saveToken(token).then((value)
+      {
+        print('success => ');
+      }).catchError((error)
+      {
+        print('error => ${error.toString()}');
+      });
 
       emit(LoginStateSuccess());
     }).catchError((error)
