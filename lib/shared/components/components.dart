@@ -1,118 +1,153 @@
 import 'package:flutter/material.dart';
 import 'package:naruto/models/courses/courses_model.dart';
+import 'package:naruto/modules/home/cubit/cubit.dart';
+import 'package:naruto/shared/cubit/cubit.dart';
+import 'package:naruto/shared/localization/localization_model.dart';
 import 'package:naruto/shared/network/remote/dio_helper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 SharedPreferences preferences;
 
-Future<void> initApp() async
-{
+Future<void> initApp() async {
   DioHelper();
   await initPref();
 }
 
-Future<void> initPref() async
-{
-  return await SharedPreferences.getInstance().then((value)
-  {
+Future<void> initPref() async {
+  return await SharedPreferences.getInstance().then((value) {
     preferences = value;
     print('done =>');
-  }).catchError((error){
+  }).catchError((error) {
     print('error => ${error.toString()}');
-
   });
 }
 
 Future<bool> saveToken(String token) => preferences.setString('myToken', token);
 
+Future<bool> saveLocaleCode(String locale) =>
+    preferences.setString('locale', locale);
+
+Future<bool> saveAppTheme(bool theme) => preferences.setBool('theme', theme);
+
 String getToken() => preferences.getString('myToken');
+
+bool getAppTheme() => preferences.getBool('theme');
+
+String getLocaleCode() => preferences.getString('locale');
 
 Future<bool> clearToken() => preferences.remove('myToken');
 
 Widget progressIndicator() => Center(child: CircularProgressIndicator());
 
 void navigateTo(context, widget) => Navigator.push(
-  context,
-  MaterialPageRoute(
-    builder: (context) => widget,
-  ),
-);
+      context,
+      MaterialPageRoute(
+        builder: (context) => widget,
+      ),
+    );
 
 void navigateAndFinish(context, widget) => Navigator.pushAndRemoveUntil(
     context,
     MaterialPageRoute(
       builder: (context) => widget,
     ),
-        (Route<dynamic> route) => false);
+    (Route<dynamic> route) => false);
 
-Widget courseItem(Data data) => Padding(
-  padding: const EdgeInsets.all(
-    20.0,
-  ),
-  child: Row(
-    crossAxisAlignment: CrossAxisAlignment.center,
-    children: [
-      Container(
-        width: 100.0,
-        height: 100.0,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(
-            10.0,
-          ),
-          border: Border.all(
-            width: 1.0,
-            color: Colors.grey[300],
-          ),
-          image: DecorationImage(
-            image: NetworkImage(
-              data.image,),
-            fit: BoxFit.cover,
-          ),
-        ),
+Widget courseItem(Data data, BuildContext context) => Padding(
+      padding: const EdgeInsets.all(
+        20.0,
       ),
-      SizedBox(
-        width: 20.0,
-      ),
-      Expanded(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children:
-          [
-            Text(
-              data.title,
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 16.0,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Container(
+            width: 100.0,
+            height: 100.0,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(
+                10.0,
               ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-            SizedBox(
-              height: 10.0,
-            ),
-            Text(
-              data.description,
-              maxLines: 3,
-              overflow: TextOverflow.ellipsis,
-            ),
-            SizedBox(
-              height: 10.0,
-            ),
-            Text(
-              '${data.price} L.E',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 16.0,
-                color: Colors.blue,
+              border: Border.all(
+                width: 1.0,
+                color: Colors.grey[300],
+              ),
+              image: DecorationImage(
+                image: NetworkImage(
+                  data.image,
+                ),
+                fit: BoxFit.cover,
               ),
             ),
-          ],
-        ),
+          ),
+          SizedBox(
+            width: 20.0,
+          ),
+          Expanded(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  data.title,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16.0,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                SizedBox(
+                  height: 10.0,
+                ),
+                Text(
+                  data.description,
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                SizedBox(
+                  height: 10.0,
+                ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: InkWell(
+                        onTap: ()
+                        {
+                          HomeScreenCubit.get(context).getCart();
+                        },
+                        child: Text(
+                          '${data.price} L.E',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16.0,
+                            color: Colors.blue,
+                          ),
+                        ),
+                      ),
+                    ),
+                    InkWell(
+                      onTap: ()
+                      {
+                        print(data.id.toString());
+                        HomeScreenCubit.get(context).addToCart(data.id.toString());
+                      },
+                      child: Text(
+                        getLocale(context).addToCart,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16.0,
+                          color: Colors.blue,
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
-    ],
-  ),
-);
+    );
 
 Widget defaultFormField({
   @required TextEditingController con,
@@ -153,23 +188,27 @@ Widget defaultButton({
   @required Function press,
   @required String text,
   double radius = 5,
-}) => Container(
-  width: double.infinity,
-  clipBehavior: Clip.antiAliasWithSaveLayer,
-  decoration: BoxDecoration(
-    borderRadius: BorderRadius.circular(
-      radius,
-    ),
-    color: Colors.blue,
-  ),
-  child: MaterialButton(
-    height: 40.0,
-    onPressed: press,
-    child: Text(
-      text.toUpperCase(),
-      style: TextStyle(
-        color: Colors.white,
+}) =>
+    Container(
+      width: double.infinity,
+      height: 40.0,
+      clipBehavior: Clip.antiAliasWithSaveLayer,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(
+          radius,
+        ),
+        color: Colors.blue,
       ),
-    ),
-  ),
-);
+      child: MaterialButton(
+        height: 40.0,
+        onPressed: press,
+        child: Text(
+          text.toUpperCase(),
+          style: TextStyle(
+            color: Colors.white,
+          ),
+        ),
+      ),
+    );
+
+LocalizationModel getLocale(context) => AppCubit.get(context).localizationModel;

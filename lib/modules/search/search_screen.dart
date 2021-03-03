@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:naruto/modules/home/cubit/cubit.dart';
 import 'package:naruto/modules/home/cubit/states.dart';
 import 'package:naruto/shared/components/components.dart';
+import 'package:naruto/shared/cubit/cubit.dart';
 
 class SearchScreen extends StatelessWidget
 {
@@ -26,7 +27,7 @@ class SearchScreen extends StatelessWidget
               key: formKey,
               child: defaultFormField(
                 con: searchController,
-                label: 'Search',
+                label: getLocale(context).search,
                 type: TextInputType.text,
                 validate: 'enter a valid data',
                 submit: (value)
@@ -51,7 +52,7 @@ class SearchScreen extends StatelessWidget
                         ListView.separated(
                           physics: BouncingScrollPhysics(),
                           shrinkWrap: true,
-                          itemBuilder: (context, index) => courseItem(model.result.data[index]),
+                          itemBuilder: (context, index) => courseItem(model.result.data[index], context),
                           separatorBuilder: (context, index) => Container(
                             width: double.infinity,
                             height: 1.0,
@@ -83,7 +84,7 @@ class SearchScreen extends StatelessWidget
                   ),
                   fallback: (context) => Center(
                     child: Text(
-                      'please enter search',
+                      getLocale(context).enterSearch,
                     ),
                   ),
                 ),

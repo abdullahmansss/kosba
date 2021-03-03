@@ -1,11 +1,14 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:naruto/layout/home_layout.dart';
 import 'package:naruto/modules/home/cubit/cubit.dart';
+import 'package:naruto/modules/home/home_screen.dart';
 import 'package:naruto/modules/login/login_screen.dart';
-import 'package:naruto/modules/test.dart';
 import 'package:naruto/shared/components/components.dart';
+import 'package:naruto/shared/cubit/cubit.dart';
+import 'package:naruto/shared/cubit/states.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,31 +19,66 @@ void main() async {
 
   var token = getToken();
 
-  runApp(MyApp(token));
+  var locale = getLocaleCode();
+
+  String translation =
+      await rootBundle.loadString('assets/translations/${locale ?? 'ar'}.json');
+
+  print(translation);
+
+  runApp(MyApp(
+    token,
+    translation: translation,
+    code: locale ?? 'ar',
+  ));
 }
 
 class MyApp extends StatelessWidget {
   final String token;
+  final String translation;
+  final String code;
 
-  MyApp(this.token);
+  MyApp(
+    this.token, {
+    this.translation,
+    this.code,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Naruto',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (BuildContext context) => HomeScreenCubit()..getCourses(),
+        ),
+        BlocProvider(
+          create: (BuildContext context) => AppCubit()
+            ..changeAppDirection(code)..setAppTheme()
+            ..loadLocalization(
+              json: this.translation,
+            ),
+        ),
+      ],
+      child: BlocConsumer<AppCubit, AppStates>(
+        listener: (context, state) {},
+        builder: (context, state) {
+          return MaterialApp(
+            title: 'Naruto',
+            debugShowCheckedModeBanner: false,
+            darkTheme: AppCubit.get(context).isDark ? ThemeData.dark() : ThemeData.light(),
+            theme: ThemeData(
+              primarySwatch: Colors.blue,
+              visualDensity: VisualDensity.adaptivePlatformDensity,
+            ),
+            home: token != null
+                ? Directionality(
+                    textDirection: AppCubit.get(context).appDirection,
+                    child: HomeLayout(),
+                  )
+                : LoginScreen(),
+          );
+        },
       ),
-      home: token != null
-          ? MultiBlocProvider(providers: [
-              BlocProvider(
-                create: (BuildContext context) =>
-                    HomeScreenCubit()..getCourses(),
-              ),
-            ], child: HomeLayout())
-          : LoginScreen(),
     );
   }
 }

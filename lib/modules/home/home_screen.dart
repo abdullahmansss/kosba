@@ -21,16 +21,16 @@ class HomeScreen extends StatelessWidget {
             physics: BouncingScrollPhysics(),
             child: Column(
               children: [
-                ExpansionTile(
-                  title: Text(
-                    '',
-                  ),
-                ),
+                // ExpansionTile(
+                //   title: Text(
+                //     '',
+                //   ),
+                // ),
                 ListView.separated(
                   physics: BouncingScrollPhysics(),
                   shrinkWrap: true,
                   itemBuilder: (context, index) =>
-                      courseItem(model.result.data[index]),
+                      courseItem(model.result.data[index], context),
                   separatorBuilder: (context, index) => Container(
                     width: double.infinity,
                     height: 1.0,
@@ -52,7 +52,7 @@ class HomeScreen extends StatelessWidget {
                           }
                         },
                         radius: 0.0,
-                        text: 'load more..',
+                        text: getLocale(context).load,
                       ),
                       fallback: (context) => progressIndicator(),
                     ),

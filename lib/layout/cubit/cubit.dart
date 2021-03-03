@@ -6,7 +6,8 @@ import 'package:naruto/modules/home/home_screen.dart';
 import 'package:naruto/modules/search/search_screen.dart';
 import 'package:naruto/modules/settings/settings_screen.dart';
 
-class HomeLayoutCubit extends Cubit<HomeLayoutStates> {
+class HomeLayoutCubit extends Cubit<HomeLayoutStates>
+{
   HomeLayoutCubit() : super(HomeLayoutInitialState());
 
   static HomeLayoutCubit get(context) => BlocProvider.of(context);
@@ -18,13 +19,6 @@ class HomeLayoutCubit extends Cubit<HomeLayoutStates> {
     SearchScreen(),
     CartScreen(),
     SettingsScreen(),
-  ];
-
-  List<String> titles = [
-    '',
-    'Search',
-    'Cart',
-    'Settings',
   ];
 
   List<List<Widget>> actions = [
@@ -61,7 +55,8 @@ class HomeLayoutCubit extends Cubit<HomeLayoutStates> {
     [],
   ];
 
-  changeIndex(int index) {
+  changeIndex(int index)
+  {
     currentIndex = index;
     emit(HomeLayoutIndexState());
   }

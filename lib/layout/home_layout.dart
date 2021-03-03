@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:naruto/layout/cubit/cubit.dart';
 import 'package:naruto/layout/cubit/states.dart';
+import 'package:naruto/shared/cubit/cubit.dart';
 
 class HomeLayout extends StatelessWidget {
   @override
@@ -14,7 +15,7 @@ class HomeLayout extends StatelessWidget {
           return Scaffold(
             appBar: AppBar(
               titleSpacing: 20.0,
-              title: Text(HomeLayoutCubit.get(context)
+              title: Text(AppCubit.get(context)
                   .titles[HomeLayoutCubit.get(context).currentIndex]),
               // actions: HomeLayoutCubit.get(context)
               //     .actions[HomeLayoutCubit.get(context).currentIndex],

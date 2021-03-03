@@ -8,6 +8,14 @@ class HomeScreenLoadingMoreState extends HomeScreenStates {}
 
 class HomeScreenSuccess extends HomeScreenStates {}
 
+class AddToCartSuccess extends HomeScreenStates {}
+
+class AddToCartError extends HomeScreenStates {
+  final String error;
+
+  AddToCartError(this.error);
+}
+
 class HomeScreenError extends HomeScreenStates {
   final String error;
 
